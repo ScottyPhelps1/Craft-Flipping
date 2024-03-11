@@ -8,7 +8,7 @@ def main():
     while True:
         print("Choices:\n\t1 - Null Ovoid\n\t"
               "2 - Whale Bait\n\t3 - Enchanted Golden Carrot")
-        choice = input("Enter your choice. ")
+        choice = input("Enter your choice.")
         if choice == "1":
             null_ovoid()
         elif choice == "2":
