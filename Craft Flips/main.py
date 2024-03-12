@@ -3,9 +3,12 @@ DOUBLE_CHEST = 3456
 INVENTORY = 2240
 STACK = 64
 SINGLE_ORDER = 7964
+
+
 def main():
     while True:
-        print("Choices:\n\t1 - Null Ovoid\n\t2 - Whale Bait\n\t3 - Enchanted Golden Carrot\n\t4 - Quit")
+        print("Choices:\n\t1 - Null Ovoid\n\t2 - Whale Bait\n\t3 - Enchanted Golden Carrot\n\t4 - Revenant "
+              "Viscera\n\t5 - Tarantula Silk\n\t6 - Quit")
         choice = input("Enter your choice. ")
         if choice == "1":
             null_ovoid()
@@ -14,6 +17,10 @@ def main():
         elif choice == "3":
             golden_carrot()
         elif choice == "4":
+            revenant_viscera()
+        elif choice == "5":
+            tarantula_silk()
+        elif choice == "6":
             break
         else:
             print("Please enter a valid choice.")
@@ -29,9 +36,10 @@ def print_info(unit_buy_price, unit_sell_price, amount):
     total_revenue = unit_sell_price*amount
     profit = total_revenue-total_cost
     profit_percentage = (profit / total_cost)*100
-    print('You are crafting {:,} items at ${:,.2f} per item.'.format(amount, unit_buy_price))
-    print('Your total cost is ${:,.2f}'.format(total_cost))
-    print('Your total profit is ${:,.2f} ({:.2f}% profit)'.format(profit, profit_percentage))
+    print('You are crafting {:,} items at ${:,.1f} per item.'.format(amount, unit_buy_price))
+    print('Your total cost is ${:,.1f}'.format(total_cost))
+    print('Your total profit is ${:,.1f} ({:.1f}% profit)'.format(profit, profit_percentage))
+
 
 def get_buy_order_price(path_extension):
     json = requests.get('https://api.hypixel.net/v2/skyblock/bazaar').json()
@@ -93,6 +101,7 @@ def null_ovoid():
     amt = get_amt()
     print_info(unit_price, ovoid, amt)
 
+
 def whale_bait():
     fish = get_buy_order_price('RAW_FISH')
     salmon = get_buy_order_price('RAW_FISH:1')
@@ -112,6 +121,25 @@ def golden_carrot():
     ench_golden_carrot = get_sell_order_price('ENCHANTED_GOLDEN_CARROT')
     amt = get_amt()
     print_info(unit_price, ench_golden_carrot, amt)
+
+
+def revenant_viscera():
+    rev_flesh = get_buy_order_price('REVENANT_FLESH')
+    ench_string = get_buy_order_price('ENCHANTED_STRING')
+    unit_price = rev_flesh*128 + ench_string*32
+    viscera = get_sell_order_price('REVENANT_VISCERA')
+    amt = get_amt()
+    print_info(unit_price, viscera, amt)
+
+
+def tarantula_silk():
+    tara_web = get_buy_order_price('TARANTULA_WEB')
+    ench_flint = get_buy_order_price('ENCHANTED_FLINT')
+    unit_price = tara_web*128 + ench_flint*32
+    silk = get_sell_order_price('TARANTULA_SILK')
+    amt = get_amt()
+    print(unit_price, silk)
+    print_info(unit_price, silk, amt)
 
 
 if __name__ == "__main__":
