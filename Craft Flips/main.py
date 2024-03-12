@@ -1,4 +1,3 @@
-from bs4 import BeautifulSoup
 import requests
 DOUBLE_CHEST = 3456
 INVENTORY = 2240
@@ -6,38 +5,49 @@ STACK = 64
 SINGLE_ORDER = 7964
 def main():
     while True:
-        print("Choices:\n\t1 - Null Ovoid\n\t"
-              "2 - Whale Bait\n\t3 - Enchanted Golden Carrot")
-        choice = input("Enter your choice.")
+        print("Choices:\n\t1 - Null Ovoid\n\t2 - Whale Bait\n\t3 - Enchanted Golden Carrot\n\t4 - Quit")
+        choice = input("Enter your choice. ")
         if choice == "1":
             null_ovoid()
         elif choice == "2":
             whale_bait()
         elif choice == "3":
             golden_carrot()
+        elif choice == "4":
+            break
         else:
             print("Please enter a valid choice.")
             continue
-        choice = input("Enter 'y' to continue.")
-        if choice != 'y':
-            break
+        choice = input("Enter 'y' to continue. ")
+        if choice == 'y':
+            continue
+        break
 
 
-def whale_bait():
-    whale = whale_price()
-    fish = fish_price()
-    salmon = salmon_price()
-    prismarine = prismarine_price()
-    gold = gold_price()
-    ink = ink_price()
-    unit_price = round(fish*5 + salmon + prismarine*3 + gold*9 + ink, 1)
-    amt = get_amt()
-    print_profit(unit_price, whale, amt)
+def print_info(unit_buy_price, unit_sell_price, amount):
+    total_cost = unit_buy_price*amount
+    total_revenue = unit_sell_price*amount
+    profit = total_revenue-total_cost
+    profit_percentage = (profit / total_cost)*100
+    print('You are crafting {:,} items at ${:,.2f} per item.'.format(amount, unit_buy_price))
+    print('Your total cost is ${:,.2f}'.format(total_cost))
+    print('Your total profit is ${:,.2f} ({:.2f}% profit)'.format(profit, profit_percentage))
+
+def get_buy_order_price(path_extension):
+    json = requests.get('https://api.hypixel.net/v2/skyblock/bazaar').json()
+    return float(json['products'][path_extension]['sell_summary'][0]['pricePerUnit'])
+
+
+def get_sell_order_price(path_extension):
+    json = requests.get('https://api.hypixel.net/v2/skyblock/bazaar').json()
+    return float(json['products'][path_extension]['buy_summary'][0]['pricePerUnit'])
+
 
 def get_amt():
     while True:
         print("Either enter a number or one of these keywords:\n\tSTACK = 64\n\tINVENTORY = "
-              "2240\n\tDOUBLE_CHEST = 3456\n\tSINGLE_ORDER = 7964")
+              "2240\n\tDOUBLE_CHEST = 3456\n\tSINGLE_ORDER = 7964\n\tAdd a number before any keyword to craft that "
+              "many of the keyword value.")
         choice = input("How much would you like to craft? ")
         if choice.isdigit():
             amt = int(choice)
@@ -54,99 +64,54 @@ def get_amt():
         elif choice == 'SINGLE_ORDER':
             amt = SINGLE_ORDER
             break
+        elif choice.find(' ') == -1:
+            print(choice.find(' '))
         elif choice[choice.index(' ')+1:] == 'DOUBLE_CHEST':
             num = int(choice[:choice.index(' ')])
             amt = num*DOUBLE_CHEST
             break
-
-        print("Please enter a valid amount.")
+        elif choice[choice.index(' ')+1:] == 'STACK':
+            num = int(choice[:choice.index(' ')])
+            amt = num*STACK
+            break
+        elif choice[choice.index(' ')+1:] == 'INVENTORY':
+            num = int(choice[:choice.index(' ')])
+            amt = num*INVENTORY
+            break
+        elif choice[choice.index(' ')+1:] == 'SINGLE_ORDER':
+            num = int(choice[:choice.index(' ')])
+            amt = num*SINGLE_ORDER
+            break
     return amt
 
 
-def print_profit(unit_cost, unit_profit, amt):
-    total_cost = round(unit_cost*amt, 1)
-    total_revenue = round(unit_profit*amt, 1)
-    profit = round(total_revenue-total_cost, 1)
-    profit_percentage = round((profit / total_cost) * 100, 2)
-    print('You are crafting {:,} items, at ${:,} per item.'.format(amt, unit_cost))
-    print('Total Cost: ${:,}'.format(total_cost))
-    print('Total Profit: ${:,} ({:.2f}% profit)'.format(profit, profit_percentage))
-
-
-def whale_price():
-    html_text = requests.get('https://www.skyblock.bz/product/WHALE_BAIT').text
-    soup = BeautifulSoup(html_text, 'lxml')
-    divs = soup.find_all('td', class_="svelte-f7mtyj")[13].text
-    return float(divs.replace(',', '')[:divs.index(' ')])
-
-
-def fish_price():
-    html_text = requests.get('https://www.skyblock.bz/product/RAW_FISH').text
-    soup = BeautifulSoup(html_text, 'lxml')
-    divs = soup.find_all('td', class_="svelte-f7mtyj")[1].text
-    return float(divs.replace(',', '')[:divs.index(' ')])
-
-
-def salmon_price():
-    html_text = requests.get('https://www.skyblock.bz/product/RAW_FISH:1').text
-    soup = BeautifulSoup(html_text, 'lxml')
-    divs = soup.find_all('td', class_="svelte-f7mtyj")[1].text
-    return float(divs.replace(',', '')[:divs.index(' ')])
-
-
-def prismarine_price():
-    html_text = requests.get('https://www.skyblock.bz/product/PRISMARINE_CRYSTALS').text
-    soup = BeautifulSoup(html_text, 'lxml')
-    divs = soup.find_all('td', class_="svelte-f7mtyj")[1].text
-    return float(divs.replace(',', '')[:divs.index(' ')])
-
-
-def gold_price():
-    html_text = requests.get('https://www.skyblock.bz/product/GOLD_INGOT').text
-    soup = BeautifulSoup(html_text, 'lxml')
-    divs = soup.find_all('td', class_="svelte-f7mtyj")[1].text
-    return float(divs.replace(',', '')[:divs.index(' ')])
-
-
-def ink_price():
-    html_text = requests.get('https://www.skyblock.bz/product/INK_SACK').text
-    soup = BeautifulSoup(html_text, 'lxml')
-    divs = soup.find_all('td', class_="svelte-f7mtyj")[1].text
-    return float(divs.replace(',', '')[:divs.index(' ')])
-
-
 def null_ovoid():
-    spheres = sphere_price()
-    obsidian = obsidian_price()
-    ovoid = ovoid_price()
-    unit_price = round(spheres*128 + obsidian*32, 1)
+    null_sphere = get_buy_order_price('NULL_SPHERE')
+    ench_obsidian = get_buy_order_price('ENCHANTED_OBSIDIAN')
+    unit_price = round(null_sphere*128 + ench_obsidian*32, 1)
+    ovoid = get_sell_order_price('NULL_OVOID')
     amt = get_amt()
-    print_profit(unit_price, ovoid, amt)
+    print_info(unit_price, ovoid, amt)
 
-
-def sphere_price():
-    html_text = requests.get('https://www.skyblock.bz/product/NULL_SPHERE').text
-    soup = BeautifulSoup(html_text, 'lxml')
-    divs = soup.find_all('td', class_="svelte-f7mtyj")[1].text
-    return float(divs.replace(',', '')[:divs.index(' ')])
-
-
-def obsidian_price():
-    html_text = requests.get('https://www.skyblock.bz/product/ENCHANTED_OBSIDIAN').text
-    soup = BeautifulSoup(html_text, 'lxml')
-    divs = soup.find_all('td', class_="svelte-f7mtyj")[1].text
-    return float(divs.replace(',', '')[:divs.index(' ')])
-
-
-def ovoid_price():
-    html_text = requests.get('https://www.skyblock.bz/product/NULL_OVOID').text
-    soup = BeautifulSoup(html_text, 'lxml')
-    divs = soup.find_all('td', class_="svelte-f7mtyj")[13].text
-    return float(divs.replace(',', '')[:divs.index(' ')])
+def whale_bait():
+    fish = get_buy_order_price('RAW_FISH')
+    salmon = get_buy_order_price('RAW_FISH:1')
+    gold = get_buy_order_price('GOLD_INGOT')
+    ink = get_buy_order_price('INK_SACK')
+    prismarine = get_buy_order_price('PRISMARINE_CRYSTALS')
+    whale = get_sell_order_price('WHALE_BAIT')
+    unit_price = fish*5 + salmon + gold*9 + ink + prismarine*3
+    amt = get_amt()
+    print_info(unit_price, whale, amt)
 
 
 def golden_carrot():
-    print(1)
+    ench_carrot = get_buy_order_price('ENCHANTED_CARROT')
+    gold_carrot = 15
+    unit_price = ench_carrot*128 + gold_carrot*32
+    ench_golden_carrot = get_sell_order_price('ENCHANTED_GOLDEN_CARROT')
+    amt = get_amt()
+    print_info(unit_price, ench_golden_carrot, amt)
 
 
 if __name__ == "__main__":
