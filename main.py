@@ -10,7 +10,7 @@ SINGLE_ORDER = 7964
 def main():
     while True:
         print("Choices:\n\t1 - Null Ovoid\n\t2 - Whale Bait\n\t3 - Enchanted Golden Carrot\n\t4 - Revenant "
-              "Viscera\n\t5 - Tarantula Silk\n\t6 - Quit")
+              "Viscera\n\t5 - Tarantula Silk\n\t6 - Booster Cookie Margins\n\t7 - Quit")
         choice = input("Enter your choice. ")
         if choice == "1":
             null_ovoid()
@@ -23,14 +23,22 @@ def main():
         elif choice == "5":
             tarantula_silk()
         elif choice == "6":
+            booster_cookie_margins()
+        elif choice == "7":
             break
         else:
             print("Please enter a valid choice.")
             continue
-        choice = input("Enter 'y' to continue. ")
-        if choice == 'y':
-            continue
-        break
+        choice = 'n'
+        while True:
+            choice = input("Enter 'y' to continue or 'n' to quit. ")
+            if choice == 'y':
+                break
+            elif choice == 'n':
+                exit()
+            else:
+                print("Please enter a valid choice.")
+
 
 
 def print_info(unit_buy_price, unit_sell_price, amount):
@@ -142,6 +150,13 @@ def tarantula_silk():
     amt = get_amt()
     print(unit_price, silk)
     print_info(unit_price, silk, amt)
+
+
+def booster_cookie_margins():
+    buy_order = get_buy_order_price("BOOSTER_COOKIE")
+    sell_order = get_sell_order_price("BOOSTER_COOKIE") * 0.99
+    margin = sell_order-buy_order
+    print("Margin: ${:,.1f}".format(margin))
 
 
 if __name__ == "__main__":
