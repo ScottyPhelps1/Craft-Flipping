@@ -154,9 +154,11 @@ def tarantula_silk():
 
 def booster_cookie_margins():
     buy_order = get_buy_order_price("BOOSTER_COOKIE")
-    sell_order = get_sell_order_price("BOOSTER_COOKIE") * 0.99
+    sell_order = get_sell_order_price("BOOSTER_COOKIE")
     margin = sell_order-buy_order
+    eff_margin = (sell_order*0.99) - buy_order
     print("Margin: ${:,.1f}".format(margin))
+    print("Effective Margin: ${:,.1f}".format(eff_margin))
 
 
 if __name__ == "__main__":
